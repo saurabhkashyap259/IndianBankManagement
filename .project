@@ -3,6 +3,7 @@
 	<name>IndianBankManagment</name>
 	<comment></comment>
 	<projects>
+		<project>BankManagement</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

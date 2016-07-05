@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+<body>
+
+<script>
+var xmlhttp = new XMLHttpRequest();
+var xmlhttpbranch = new XMLHttpRequest();
+var url = "http://localhost:8080/IndianBankManagment/rest/banks";
+var url_bank_branch = "http://localhost:8080/IndianBankManagment/rest/bank/branches"
+var bankID = 1;
+var bankName = "State Bank of India";
+
+xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        getBank(xmlhttp.responseText);
+    }
+}
+
+xmlhttpbranch.onreadystatechange=function() {
+    if (xmlhttpbranch.readyState == 4 && xmlhttpbranch.status == 200) {
+        getBranch(xmlhttpbranch.responseText);
+    }
+}
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+
+xmlhttpbranch.open("GET", url_bank_branch + "/" + bankID, true);
+xmlhttpbranch.send();
+
+function getBank(response) {
+	
+	console.log("Get bank is running");
+    var jsonArray = JSON.parse(response);
+    
+    var select = document.getElementById('dd');
+    var option;
+    for (var i = 0; i < jsonArray.length; i++) {
+      option = document.createElement('option');
+      option.id = jsonArray[i].id;
+      option.text = jsonArray[i].bank_name;
+      select.add(option);
+    }
+}
+
+function getID(s) {
+	
+	bankID = s[s.selectedIndex].id;
+	bankName = s.options[s.selectedIndex].text;
+	
+	xmlhttpbranch.open("GET", url_bank_branch + "/" + bankID, true);
+	xmlhttpbranch.send();
+	
+	getBranch(getBranch(xmlhttpbranch.responseText));
+}
+
+function getBranch(response) {
+	
+	console.log("Get branch is running");
+	
+	$('#dataTable tbody > tr').remove();
+	
+	var jsonArray = JSON.parse(response);
+	
+	var table = document.getElementById('dataTable');
+	
+	var tbody = document.createElement('tbody');
+	
+	console.log(bankName);
+	
+	console.log(jsonArray.length);
+	for (i = 0; i < jsonArray.length; i++) {
+	    var tr = document.createElement('tr');
+	    var td1 = document.createElement('td');
+        td1.appendChild(document.createTextNode(jsonArray[i].ifsc));
+        tr.appendChild(td1);
+        
+        var td2 = document.createElement('td');
+        td2.appendChild(document.createTextNode(bankName));
+        tr.appendChild(td2);
+        
+        var td3 = document.createElement('td');
+        td3.appendChild(document.createTextNode(jsonArray[i].branch));
+        tr.appendChild(td3);
+        
+        var td4 = document.createElement('td');
+        td4.appendChild(document.createTextNode(jsonArray[i].address));
+        tr.appendChild(td4);
+        
+        var td5 = document.createElement('td');
+        td5.appendChild(document.createTextNode(jsonArray[i].city));
+        tr.appendChild(td5);
+        
+        var td6 = document.createElement('td');
+        td6.appendChild(document.createTextNode(jsonArray[i].district));
+        tr.appendChild(td6);
+        
+        var td7 = document.createElement('td');
+        td7.appendChild(document.createTextNode(jsonArray[i].state));
+        tr.appendChild(td7);
+        
+	    tbody.appendChild(tr);
+	}
+	
+	table.appendChild(tbody);
+}
+
+function doSearch() {
+    var searchText = document.getElementById('searchTerm').value;
+    var targetTable = document.getElementById('dataTable');
+    var targetTableColCount;
+            
+    //Loop through table rows
+    for (var rowIndex = 0; rowIndex < targetTable.rows.length; rowIndex++) {
+        var rowData = '';
+
+        //Get column count from header row
+        if (rowIndex == 0) {
+           targetTableColCount = targetTable.rows.item(rowIndex).cells.length;
+           continue; //do not execute further code for header row.
+        }
+                
+        //Process data rows. (rowIndex >= 1)
+        for (var colIndex = 0; colIndex < targetTableColCount; colIndex++) {
+            rowData += targetTable.rows.item(rowIndex).cells.item(colIndex).textContent;
+        }
+
+        //If search term is not found in row data
+        //then hide the row, else show
+        if (rowData.toLowerCase().indexOf(searchText) == -1)
+            targetTable.rows.item(rowIndex).style.display = 'none';
+        else
+            targetTable.rows.item(rowIndex).style.display = 'table-row';
+    }
+}
+
+</script>
+
+<h1>Banks</h1>
+<select id="dd" onchange="getID(this)"></select>
+
+<input type="text" id="searchTerm" class="search_box" onkeyup="doSearch()" />
+
+<table id="dataTable" border="1" width="100%" cellspacing="0" cellpadding="5">
+     <thead>
+         <tr>
+            <th>IFSC</th>
+            <th>Bank</th>
+            <th>Branch</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>District</th>
+            <th>State</th>
+         </tr>
+     </thead>
+</table>
+
+</body>
+</html>

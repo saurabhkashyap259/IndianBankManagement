@@ -2,6 +2,9 @@
     <wb-module deploy-name="IndianBankManagment">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/BankManagement/BankManagement">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="IndianBankManagment"/>
         <property name="java-output-path" value="/IndianBankManagment/build/classes"/>
     </wb-module>
